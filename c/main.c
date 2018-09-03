@@ -9,24 +9,24 @@
 
 /*
 const (
-	secondsPerMinute = 60
-	secondsPerHour   = 60 * 60
-	secondsPerDay    = 24 * secondsPerHour
-	secondsPerWeek   = 7 * secondsPerDay
-	daysPer400Years  = 365*400 + 97
-	daysPer100Years  = 365*100 + 24
-	daysPer4Years    = 365*4 + 1
+  secondsPerMinute = 60
+  secondsPerHour   = 60 * 60
+  secondsPerDay    = 24 * secondsPerHour
+  secondsPerWeek   = 7 * secondsPerDay
+  daysPer400Years  = 365*400 + 97
+  daysPer100Years  = 365*100 + 24
+  daysPer4Years    = 365*4 + 1
 )
 */
 #define secondsPerHour (60L * 60L)
 #define secondsPerDay  (24 * secondsPerHour)
 
 /*
-	unixToInternal int64 = (1969*365 + 1969/4 - 1969/100 + 1969/400) * secondsPerDay
-	internalToUnix int64 = -unixToInternal
+  unixToInternal int64 = (1969*365 + 1969/4 - 1969/100 + 1969/400) * secondsPerDay
+  internalToUnix int64 = -unixToInternal
 
-	wallToInternal int64 = (1884*365 + 1884/4 - 1884/100 + 1884/400) * secondsPerDay
-	internalToWall int64 = -wallToInternal
+  wallToInternal int64 = (1884*365 + 1884/4 - 1884/100 + 1884/400) * secondsPerDay
+  internalToWall int64 = -wallToInternal
 */
 #define unixToInternal ((1969*365 + 1969/4 - 1969/100 + 1969/400) * secondsPerDay)
 #define internalToUnix (-unixToInternal)
@@ -35,11 +35,11 @@ const (
 /*
 
 const (
-	hasMonotonic = 1 << 63
-	maxWall      = wallToInternal + (1<<33 - 1) // year 2157
-	minWall      = wallToInternal               // year 1885
-	nsecMask     = 1<<30 - 1
-	nsecShift    = 30
+  hasMonotonic = 1 << 63
+  maxWall      = wallToInternal + (1<<33 - 1) // year 2157
+  minWall      = wallToInternal               // year 1885
+  nsecMask     = 1<<30 - 1
+  nsecShift    = 30
 )
 */
 #define hasMonotonic (1L << 63)
@@ -57,18 +57,18 @@ typedef struct {
 typedef int64_t duration_t;
 
 /*
-	minDuration Duration = -1 << 63
-	maxDuration Duration = 1<<63 - 1
+  minDuration Duration = -1 << 63
+  maxDuration Duration = 1<<63 - 1
  */
 
 #define minDuration ((duration_t) -0x8000000000000000)
 #define maxDuration ((duration_t) 0x7fffffffffffffff)
 
 /*
-	Nanosecond  Duration = 1
-	Microsecond          = 1000 * Nanosecond
-	Millisecond          = 1000 * Microsecond
-	Second               = 1000 * Millisecond
+  Nanosecond  Duration = 1
+  Microsecond          = 1000 * Nanosecond
+  Millisecond          = 1000 * Microsecond
+  Second               = 1000 * Millisecond
 */
 #define Nanosecond  ((duration_t) 1)
 #define Microsecond ((duration_t) (1000 * Nanosecond))
@@ -150,7 +150,7 @@ int64_t time_unixSec(const go_time_t t) {
 
 /*
 func (t Time) UnixNano() int64 {
-	return (t.unixSec())*1e9 + int64(t.nsec())
+  return (t.unixSec())*1e9 + int64(t.nsec())
 }
 */
 int64_t time_unixNano(const go_time_t t) {
@@ -175,17 +175,17 @@ bool time_before(const go_time_t t, const go_time_t u) {
 
 /*
 func (t Time) Equal(u Time) bool {
-	if t.wall&u.wall&hasMonotonic != 0 {
-		return t.ext == u.ext
-	}
-	return t.sec() == u.sec() && t.nsec() == u.nsec()
+  if t.wall&u.wall&hasMonotonic != 0 {
+    return t.ext == u.ext
+  }
+  return t.sec() == u.sec() && t.nsec() == u.nsec()
 }
 */
 bool time_equal(const go_time_t t, const go_time_t u) {
-	if ((t.wall & u.wall & hasMonotonic) != 0) {
-		return t.ext == u.ext;
-	}
-	return time_sec(t) == time_sec(u) && time_nsec(t) == time_nsec(u);
+  if ((t.wall & u.wall & hasMonotonic) != 0) {
+    return t.ext == u.ext;
+  }
+  return time_sec(t) == time_sec(u) && time_nsec(t) == time_nsec(u);
 }
 
 /*
@@ -390,23 +390,23 @@ int main() {
       n = now();
     }
 
-		// do task
+    // do task
     printf("Woke at ");
     print_time(n);
     printf(" (should be >= ");
     print_time(wakeTime);
     printf(")\n");
 
-		const double oldNowSecs = time_unixNano(oldNow) / (double) 1e9;
-		const double nowSecs = time_unixNano(n) / (double) 1e9;
-		const double wallDiff = nowSecs - oldNowSecs;
-		const double monoDiff = (time_mono(n) - time_mono(oldNow)) / 1e9;
-		printf("Wall diff: %.6f        Mono diff: %.6f\n", wallDiff, monoDiff);
+    const double oldNowSecs = time_unixNano(oldNow) / (double) 1e9;
+    const double nowSecs = time_unixNano(n) / (double) 1e9;
+    const double wallDiff = nowSecs - oldNowSecs;
+    const double monoDiff = (time_mono(n) - time_mono(oldNow)) / 1e9;
+    printf("Wall diff: %.6f        Mono diff: %.6f\n", wallDiff, monoDiff);
 
-		if (time_unixNano(n) < time_unixNano(wakeTime)) {
-			printf("BUG ENCOUNTERED!!!\n");
-			exit(1);
-		}
+    if (time_unixNano(n) < time_unixNano(wakeTime)) {
+      printf("BUG ENCOUNTERED!!!\n");
+      exit(1);
+    }
 
     printf("\n");
   }
